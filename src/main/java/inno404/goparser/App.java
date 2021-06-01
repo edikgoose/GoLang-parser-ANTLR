@@ -1,5 +1,6 @@
 package inno404.goparser;
 
+
 /**
  * Hello world!
  *
