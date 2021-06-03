@@ -136,3 +136,6 @@ DECIMAL_FLOAT_LIT                   :   DECIMAL_DIGITS '.' DECIMAL_DIGITS? DECIM
 
 HEX_FLOAT_LIT                       :   '0' [xX] HEX_MANTISSA HEX_EXPONENT;
 
+
+/* Imaginary literals */
+IMAGINARY_LIT                       :   (DECIMAL_DIGITS | INT_LIT | FLOAT_LIT) 'i';

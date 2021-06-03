@@ -2,5 +2,5 @@ parser grammar GoParser;
 
 options { tokenVocab=GoLexer; }
 
-letter  :   (FLOAT_LIT WHITESPACE*)*;
+letter  :   (IMAGINARY_LIT WHITESPACE*)*;
 
