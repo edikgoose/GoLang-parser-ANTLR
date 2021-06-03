@@ -139,3 +139,17 @@ HEX_FLOAT_LIT                       :   '0' [xX] HEX_MANTISSA HEX_EXPONENT;
 
 /* Imaginary literals */
 IMAGINARY_LIT                       :   (DECIMAL_DIGITS | INT_LIT | FLOAT_LIT) 'i';
+
+/* Rune literals */
+RUNE_LIT                            :   '\'' ( UNICODE_VALUE | BYTE_VALUE ) '\'';
+
+UNICODE_VALUE                       :   ~[\r\n] | UNICODE_CHAR | LITTLE_U_VALUE | BIG_U_VALUE | ESCAPED_CHAR;
+BYTE_VALUE                          :   OCTAL_BYTE_VALUE | HEX_BYTE_VALUE;
+
+OCTAL_BYTE_VALUE                    :   '\\' OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT;
+HEX_BYTE_VALUE                      :   '\\' 'x' HEX_DIGIT HEX_DIGIT;
+
+LITTLE_U_VALUE                      :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT; // 4
+BIG_U_VALUE                         :   '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+                                                 HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT; // 8
+ESCAPED_CHAR                        :   '\\' ( 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' | '\\' | '\'' | '"' );
