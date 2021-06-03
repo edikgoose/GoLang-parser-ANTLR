@@ -2,4 +2,6 @@ parser grammar GoParser;
 
 options { tokenVocab=GoLexer; }
 
-plus : NUMBER NUMBER;
+letter  :   (FLOAT_LIT WHITESPACE*)* | WHITESPACE*;
+
+exp     :   DECIMAL_EXPONENT;
