@@ -5,10 +5,10 @@ lexer grammar GoLexer;
 
 
 /* Unicode */
-fragment NEW_LINE                   :   [\u000A];   // \n
+fragment NEW_LINE                   :   [\n\r];
 fragment UNICODE_LETTER             :   [\p{L}\p{M}*];
 fragment UNICODE_DIGIT              :   [\p{Nd}];
-fragment UNICODE_CHAR               :   .[\p{M}]*;
+fragment UNICODE_CHAR               :   ~[\n\r]; // not a NEW_LINE
 
 
 /* Letters, digits, exponents */
@@ -42,9 +42,10 @@ LINE_COMMENT                        :   '//' ~[\r\n]* -> channel(HIDDEN);
 
 /* Whitespace symbols */
 WHITESPACE                          :   NEW_LINE
-                                    |   [\u0009] // '\t'
+                                    |   [\t]
                                     |   [\u0020] // ' '
-                                    |   [\u000D]; // '\r'
+                                    |   [\r]
+                                    ;
 
 
 IDENTIFIER                          :   LETTER (LETTER | UNICODE_DIGIT)*;
@@ -143,13 +144,40 @@ IMAGINARY_LIT                       :   (DECIMAL_DIGITS | INT_LIT | FLOAT_LIT) '
 /* Rune literals */
 RUNE_LIT                            :   '\'' ( UNICODE_VALUE | BYTE_VALUE ) '\'';
 
-UNICODE_VALUE                       :   ~[\r\n] | UNICODE_CHAR | LITTLE_U_VALUE | BIG_U_VALUE | ESCAPED_CHAR;
+UNICODE_VALUE                       :   UNICODE_CHAR | LITTLE_U_VALUE | BIG_U_VALUE | ESCAPED_CHAR;
 BYTE_VALUE                          :   OCTAL_BYTE_VALUE | HEX_BYTE_VALUE;
 
-OCTAL_BYTE_VALUE                    :   '\\' OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT;
+OCTAL_BYTE_VALUE                    :   '\\' OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT
+                                        /* UTF-8 range maintenance */
+                                            {
+                                             Integer.parseInt(getText().substring(getText().indexOf('\\') + 1), 8) < Integer.parseInt("256")
+                                            }?
+                                        ;
+
 HEX_BYTE_VALUE                      :   '\\' 'x' HEX_DIGIT HEX_DIGIT;
 
-LITTLE_U_VALUE                      :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT; // 4
+
+LITTLE_U_VALUE                      :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT // 4
+                                        /* UTF-16 surrogate halves maintenance */
+                                            {
+                                             Integer.parseInt(getText().substring(getText().indexOf('u') + 1), 16) < Integer.parseInt("D800", 16)
+                                             ||
+                                             Integer.parseInt(getText().substring(getText().indexOf('u') + 1), 16) > Integer.parseInt("DFFF", 16)
+                                            }?
+                                        ;
+
 BIG_U_VALUE                         :   '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-                                                 HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT; // 8
-ESCAPED_CHAR                        :   '\\' ( 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' | '\\' | '\'' | '"' );
+                                                 HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT // 8
+                                        /* UTF-32 range maintenance */
+                                            {
+                                             Integer.parseInt(getText().substring(getText().indexOf('U') + 1), 16) <= Integer.parseInt("10FFFF", 16)
+                                            }?
+                                        ;
+
+ESCAPED_CHAR                        :   '\\' [abfnrtv\\'"]; // a b f n r t v \ ' "
+
+
+/* String literals */
+STRING_LIT                          : RAW_STRING_LIT | INTERPRETED_STRING_LIT;
+RAW_STRING_LIT                      : '`' ( UNICODE_CHAR | NEW_LINE )* '`';
+INTERPRETED_STRING_LIT              : '"' ( UNICODE_VALUE | BYTE_VALUE )* '"';
