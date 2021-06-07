@@ -5,9 +5,9 @@ lexer grammar GoLexer;
 //* ===== Fragments ===== *//
 
 
-/* Unicode */
+/* Basic symbols */
 fragment NEW_LINE                   :   [\n\r];
-fragment UNICODE_LETTER             :   [\p{L}\p{M}*];
+fragment UNICODE_LETTER             :   [\p{L}][\p{M}]*;
 fragment UNICODE_DIGIT              :   [\p{Nd}];
 fragment UNICODE_CHAR               :   ~[\n\r]; // not a NEW_LINE
 
@@ -158,7 +158,7 @@ IDENTIFIER                          :   LETTER (LETTER | UNICODE_DIGIT)*;
 //* ===== Literal Tokens ===== *//
 
 
-/* Integer literals */
+/* Integer literal */
 INT_LIT                             :   DECIMAL_LIT | BINARY_LIT | OCTAL_LIT | HEX_LIT;
 
 fragment DECIMAL_LIT                :   '0' | [1-9] ('_'? DECIMAL_DIGITS)?;
@@ -167,7 +167,7 @@ fragment OCTAL_LIT                  :   '0' [oO]? '_'?  OCTAL_DIGITS;
 fragment HEX_LIT                    :   '0' [xX] '_'? HEX_DIGITS;
 
 
-/* Floating point literals */
+/* Floating point literal */
 FLOAT_LIT                           :   DECIMAL_FLOAT_LIT | HEX_FLOAT_LIT;
 
 fragment DECIMAL_FLOAT_LIT          :   DECIMAL_DIGITS '.' DECIMAL_DIGITS? DECIMAL_EXPONENT?
@@ -178,15 +178,15 @@ fragment DECIMAL_FLOAT_LIT          :   DECIMAL_DIGITS '.' DECIMAL_DIGITS? DECIM
 fragment HEX_FLOAT_LIT              :   '0' [xX] HEX_MANTISSA HEX_EXPONENT;
 
 
-/* Imaginary literals */
+/* Imaginary literal */
 IMAGINARY_LIT                       :   (DECIMAL_DIGITS | INT_LIT | FLOAT_LIT) 'i';
 
-/* Rune literals */
+/* Rune literal */
 RUNE_LIT                            :   '\'' (~[\r\n'] | UNICODE_ENCODED_VALUE | BYTE_VALUE) '\'';
 
 
 
-/* String literals */
+/* String literal */
 STRING_LIT                          :   RAW_STRING_LIT | INTERPRETED_STRING_LIT;
 
 fragment RAW_STRING_LIT             :   '`' (~[`] | NEW_LINE)* '`';

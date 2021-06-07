@@ -4,7 +4,9 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.util.ArrayList;
 import java.util.Scanner;
+
 
 public class App
 {
@@ -17,25 +19,33 @@ public class App
     }
 
     public static void main( String[] args ) {
-        String input = "";
+        // Input part
+        StringBuilder input = new StringBuilder();
         Scanner scanner = new Scanner(System.in);
 
         while (scanner.hasNextLine()) {
-            input += scanner.nextLine() + "\n";
+            input.append(scanner.nextLine()).append(System.lineSeparator());
         }
 
-        CharStream cs = CharStreams.fromString(input);
+        // Init part
+        CharStream cs = CharStreams.fromString(input.toString());
         GoLexer lexer = new GoLexer(cs);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         GoParser parser = new GoParser(stream);
 
+
+        // Visit AST nodes
+        GoParser.TestLexerContext letterContext = parser.testLexer();
+        GoVisitor<String> visitor = new GoVisitor<>();
+        visitor.visit(letterContext);
+
+
+        // Output tokens recognized
+        lexer.reset();
         var tokenList = lexer.getAllTokens();
+        ArrayList<String> tokens = new ArrayList<>(tokenList.size());
 
-        for (var token : tokenList)
-            System.out.println(token.getType());
-
-//        GoParser.TestLexerContext letterContext = parser.testLexer();
-//        GoVisitor<String> visitor = new GoVisitor<>();
-//        visitor.visit(letterContext);
+        tokenList.forEach(e -> tokens.add(lexer.getVocabulary().getSymbolicName(e.getType())));
+        System.out.println(tokens);
     }
 }
