@@ -31,6 +31,39 @@ fragment HEX_MANTISSA               :   ('_')? HEX_DIGITS '.' (HEX_DIGITS)?
                                     |   '.' HEX_DIGITS
                                     ;
 
+/* Unicode symbols encoded as */
+fragment UNICODE_ENCODED_VALUE      :   LITTLE_U_VALUE | BIG_U_VALUE | ESCAPED_CHAR;
+
+fragment BYTE_VALUE                 :   OCTAL_BYTE_VALUE | HEX_BYTE_VALUE;
+
+fragment OCTAL_BYTE_VALUE           :   '\\' OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT
+                                        /* UTF-8 range maintenance */
+                                        {
+                                            Integer.parseInt(getText().substring(getText().indexOf('\\') + 1), 8) < Integer.parseInt("256")
+                                        }?
+                                    ;
+
+fragment HEX_BYTE_VALUE             :   '\\' 'x' HEX_DIGIT HEX_DIGIT;
+
+
+fragment LITTLE_U_VALUE             :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT // 4
+                                        /* UTF-16 surrogate halves maintenance */
+                                        {
+                                            Integer.parseInt(getText().substring(getText().indexOf('u') + 1), 16) < Integer.parseInt("D800", 16)
+                                             ||
+                                            Integer.parseInt(getText().substring(getText().indexOf('u') + 1), 16) > Integer.parseInt("DFFF", 16)
+                                        }?
+                                    ;
+
+fragment BIG_U_VALUE                :   '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+                                                 HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT // 8
+                                        /* UTF-32 range maintenance */
+                                        {
+                                            Integer.parseInt(getText().substring(getText().indexOf('U') + 1), 16) <= Integer.parseInt("10FFFF", 16)
+                                        }?
+                                    ;
+
+fragment ESCAPED_CHAR               :   '\\' [abfnrtv\\'"]; // a b f n r t v \ ' "
 
 
 //* ===== Lexical Elements ===== *//
@@ -121,64 +154,34 @@ RECEIVE                             :   '<-';
 /* Integer literals */
 INT_LIT                             :   DECIMAL_LIT | BINARY_LIT | OCTAL_LIT | HEX_LIT;
 
-DECIMAL_LIT                         :   '0' | [1-9] ('_'? DECIMAL_DIGITS)?;
-BINARY_LIT                          :   '0' [bB] '_'? BINARY_DIGITS;
-OCTAL_LIT                           :   '0' [oO]? '_'?  OCTAL_DIGITS;
-HEX_LIT                             :   '0' [xX] '_'? HEX_DIGITS;
+fragment DECIMAL_LIT                :   '0' | [1-9] ('_'? DECIMAL_DIGITS)?;
+fragment BINARY_LIT                 :   '0' [bB] '_'? BINARY_DIGITS;
+fragment OCTAL_LIT                  :   '0' [oO]? '_'?  OCTAL_DIGITS;
+fragment HEX_LIT                    :   '0' [xX] '_'? HEX_DIGITS;
 
 
 /* Floating point literals */
 FLOAT_LIT                           :   DECIMAL_FLOAT_LIT | HEX_FLOAT_LIT;
 
-DECIMAL_FLOAT_LIT                   :   DECIMAL_DIGITS '.' DECIMAL_DIGITS? DECIMAL_EXPONENT?
+fragment DECIMAL_FLOAT_LIT          :   DECIMAL_DIGITS '.' DECIMAL_DIGITS? DECIMAL_EXPONENT?
                                     |   DECIMAL_DIGITS DECIMAL_EXPONENT
                                     |   '.' DECIMAL_DIGITS DECIMAL_EXPONENT?
                                     ;
 
-HEX_FLOAT_LIT                       :   '0' [xX] HEX_MANTISSA HEX_EXPONENT;
+fragment HEX_FLOAT_LIT              :   '0' [xX] HEX_MANTISSA HEX_EXPONENT;
 
 
 /* Imaginary literals */
 IMAGINARY_LIT                       :   (DECIMAL_DIGITS | INT_LIT | FLOAT_LIT) 'i';
 
 /* Rune literals */
-RUNE_LIT                            :   '\'' ( UNICODE_VALUE | BYTE_VALUE ) '\'';
+RUNE_LIT                            :   '\'' (~[\r\n'] | UNICODE_ENCODED_VALUE | BYTE_VALUE) '\'';
 
-UNICODE_VALUE                       :   UNICODE_CHAR | LITTLE_U_VALUE | BIG_U_VALUE | ESCAPED_CHAR;
-BYTE_VALUE                          :   OCTAL_BYTE_VALUE | HEX_BYTE_VALUE;
-
-OCTAL_BYTE_VALUE                    :   '\\' OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT
-                                        /* UTF-8 range maintenance */
-                                        {
-                                            Integer.parseInt(getText().substring(getText().indexOf('\\') + 1), 8) < Integer.parseInt("256")
-                                        }?
-                                    ;
-
-HEX_BYTE_VALUE                      :   '\\' 'x' HEX_DIGIT HEX_DIGIT;
-
-
-LITTLE_U_VALUE                      :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT // 4
-                                        /* UTF-16 surrogate halves maintenance */
-                                        {
-                                            Integer.parseInt(getText().substring(getText().indexOf('u') + 1), 16) < Integer.parseInt("D800", 16)
-                                             ||
-                                            Integer.parseInt(getText().substring(getText().indexOf('u') + 1), 16) > Integer.parseInt("DFFF", 16)
-                                        }?
-                                    ;
-
-BIG_U_VALUE                         :   '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-                                                 HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT // 8
-                                        /* UTF-32 range maintenance */
-                                        {
-                                            Integer.parseInt(getText().substring(getText().indexOf('U') + 1), 16) <= Integer.parseInt("10FFFF", 16)
-                                        }?
-                                    ;
-
-ESCAPED_CHAR                        :   '\\' [abfnrtv\\'"]; // a b f n r t v \ ' "
 
 
 /* String literals */
-STRING_LIT                          : RAW_STRING_LIT | INTERPRETED_STRING_LIT;
+STRING_LIT                          :   RAW_STRING_LIT | INTERPRETED_STRING_LIT;
 
-RAW_STRING_LIT                      : '`' ( UNICODE_CHAR | NEW_LINE )* '`';
-INTERPRETED_STRING_LIT              : '"' ( UNICODE_VALUE | BYTE_VALUE )* '"';
+fragment RAW_STRING_LIT             :   '`' (~[`] | NEW_LINE)* '`';
+
+fragment INTERPRETED_STRING_LIT     :   '"' (~[\r\n"\\] | UNICODE_ENCODED_VALUE | BYTE_VALUE)* '"';

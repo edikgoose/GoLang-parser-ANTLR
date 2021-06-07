@@ -30,6 +30,7 @@ public class App
         GoParser parser = new GoParser(stream);
 
 
+
         GoParser.LetterContext letterContext = parser.letter();
         GoVisitor<String> visitor = new GoVisitor<>();
         visitor.visit(letterContext);

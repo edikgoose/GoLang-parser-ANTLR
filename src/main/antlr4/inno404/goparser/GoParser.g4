@@ -8,5 +8,5 @@ options { tokenVocab=GoLexer; }
 '
 */
 
-letter  :   (RUNE_LIT WHITESPACE*)*;
+letter  :   (STRING_LIT WHITESPACE*)*;
 
