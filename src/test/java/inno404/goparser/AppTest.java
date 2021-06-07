@@ -1,20 +1,16 @@
 package inno404.goparser;
 
-import static org.junit.Assert.assertTrue;
+import org.antlr.v4.runtime.*;
+import org.junit.*;
 
-import org.junit.Test;
 
-/**
- * Unit test for simple App.
- */
 public class AppTest 
 {
-    /**
-     * Rigorous Test :-)
-     */
-    @Test
-    public void shouldAnswerWithTrue()
-    {
-        assertTrue( true );
+    private static  String inputString;
+
+
+    @Before
+    public void parseFromInput() {
+
     }
 }

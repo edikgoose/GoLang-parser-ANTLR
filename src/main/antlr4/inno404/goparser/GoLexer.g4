@@ -1,6 +1,7 @@
 lexer grammar GoLexer;
 
 
+
 //* ===== Fragments ===== *//
 
 
@@ -66,22 +67,20 @@ fragment BIG_U_VALUE                :   '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT H
 fragment ESCAPED_CHAR               :   '\\' [abfnrtv\\'"]; // a b f n r t v \ ' "
 
 
-//* ===== Lexical Elements ===== *//
 
-/* Comments */
+//* ===== Basic Tokens ===== *//
+
+
+/* Hidden tokens */
 GENERAL_COMMENT                     :   '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT                        :   '//' ~[\r\n]* -> channel(HIDDEN);
 
-
-/* Whitespace symbols */
-WHITESPACE                          :   NEW_LINE
-                                    |   [\t]
-                                    |   [\u0020] // ' '
-                                    |   [\r]
+WHITESPACE                          :   (NEW_LINE
+                                    |    [\t]
+                                    |    [\u0020]   // ' '
+                                    |    [\r])
+                                    -> channel(HIDDEN)
                                     ;
-
-
-IDENTIFIER                          :   LETTER (LETTER | UNICODE_DIGIT)*;
 
 
 /* Keywords */
@@ -149,6 +148,14 @@ RSHIFT                              :   '>>';
 BIT_CLEAR                           :   '&^';
 EXCLAMATION                         :   '!';
 RECEIVE                             :   '<-';
+
+
+/* Identifier */
+IDENTIFIER                          :   LETTER (LETTER | UNICODE_DIGIT)*;
+
+
+
+//* ===== Literal Tokens ===== *//
 
 
 /* Integer literals */

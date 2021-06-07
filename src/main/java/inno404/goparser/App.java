@@ -10,9 +10,9 @@ public class App
 {
     public static class GoVisitor<T> extends GoParserBaseVisitor<T> {
         @Override
-        public T visitLetter(GoParser.LetterContext ctx) {
+        public T visitTestLexer(GoParser.TestLexerContext ctx) {
             System.out.println(ctx.getText());
-            return super.visitLetter(ctx);
+            return super.visitTestLexer(ctx);
         }
     }
 
@@ -29,10 +29,13 @@ public class App
         CommonTokenStream stream = new CommonTokenStream(lexer);
         GoParser parser = new GoParser(stream);
 
+        var tokenList = lexer.getAllTokens();
 
+        for (var token : tokenList)
+            System.out.println(token.getType());
 
-        GoParser.LetterContext letterContext = parser.letter();
-        GoVisitor<String> visitor = new GoVisitor<>();
-        visitor.visit(letterContext);
+//        GoParser.TestLexerContext letterContext = parser.testLexer();
+//        GoVisitor<String> visitor = new GoVisitor<>();
+//        visitor.visit(letterContext);
     }
 }
