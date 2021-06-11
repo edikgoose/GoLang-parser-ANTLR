@@ -1,5 +1,8 @@
 lexer grammar GoLexer;
 
+options {
+   superClass = GoLexerBase;
+}
 
 
 //* ===== Fragments ===== *//
@@ -71,10 +74,38 @@ fragment ESCAPED_CHAR               :   '\\' [abfnrtv\\'"]; // a b f n r t v \ '
 //* ===== Basic Tokens ===== *//
 
 
-/* Hidden tokens */
+/* Comments */
 GENERAL_COMMENT                     :   '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT                        :   '//' ~[\r\n]* -> channel(HIDDEN);
 
+
+/* End of statement */
+END                                 :   SEMI
+                                    |   EOF
+                                    |   NEW_LINE
+                                        {
+                                            getLastTokenType() == IDENTIFIER    ||
+
+                                            getLastTokenType() == INT_LIT       ||
+                                            getLastTokenType() == FLOAT_LIT     ||
+                                            getLastTokenType() == IMAGINARY_LIT ||
+                                            getLastTokenType() == RUNE_LIT      ||
+                                            getLastTokenType() == STRING_LIT    ||
+
+                                            getLastTokenType() == BREAK         ||
+                                            getLastTokenType() == CONTINUE      ||
+                                            getLastTokenType() == FALLTHROUGH   ||
+                                            getLastTokenType() == RETURN        ||
+
+                                            getLastTokenType() == PLUS_PLUS     ||
+                                            getLastTokenType() == MINUS_MINUS   ||
+                                            getLastTokenType() == R_PAREN       ||
+                                            getLastTokenType() == R_BRACKET     ||
+                                            getLastTokenType() == R_CURLY
+                                        }?;
+
+
+/* Whitespace characters */
 WHITESPACE                          :   (NEW_LINE
                                     |    [\t]
                                     |    [\u0020]   // ' '
