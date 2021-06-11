@@ -78,6 +78,17 @@ public class AppTest
         });
     }
 
+    @Test
+    public void testLexer3() {
+        String[] tokens = getTokensFromFile("src/test/resources/tests/go_src_3.go");
+
+        assertArrayEquals(tokens, new String[]
+        {
+                "PACKAGE", "IDENTIFIER",
+                "GENERAL_COMMENT", "FUNC", "IDENTIFIER", "L_PAREN", "R_PAREN", "L_CURLY",
+                "R_CURLY", "LINE_COMMENT"
+        });
+    }
 
 
     private String[] getTokensFromFile(String filePath) {
