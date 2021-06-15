@@ -10,11 +10,38 @@ import java.util.Scanner;
 
 public class App
 {
-    public static class GoVisitor<T> extends GoParserBaseVisitor<T> {
+    private static class GoVisitor<T> extends GoParserBaseVisitor<T>{
         @Override
-        public T visitTestLexer(GoParser.TestLexerContext ctx) {
-            System.out.println(ctx.getText());
-            return super.visitTestLexer(ctx);
+        public T visitSourceFile(GoParser.SourceFileContext ctx) {
+            System.out.println("I started");
+            var to_return = super.visitSourceFile(ctx);
+            System.out.println("I finished");
+
+            return to_return;
+        }
+
+        @Override
+        public T visitTypeDecl(GoParser.TypeDeclContext ctx) {
+            var to_return = super.visitTypeDecl(ctx);
+            System.out.println("typeDecl");
+
+            return to_return;
+        }
+
+        @Override
+        public T visitConstDecl(GoParser.ConstDeclContext ctx) {
+            var to_return = super.visitConstDecl(ctx);
+            System.out.println("constDecl");
+
+            return to_return;
+        }
+
+        @Override
+        public T visitVarDecl(GoParser.VarDeclContext ctx) {
+            var to_return = super.visitVarDecl(ctx);
+            System.out.println("varDecl");
+
+            return to_return;
         }
     }
 
@@ -34,10 +61,10 @@ public class App
         GoParser parser = new GoParser(stream);
 
 
-        // Visit AST nodes
-        GoParser.TestLexerContext letterContext = parser.testLexer();
-        GoVisitor<String> visitor = new GoVisitor<>();
-        visitor.visit(letterContext);
+        // Visit Parser Tree
+        var sourceFileContext = parser.sourceFile();
+        GoVisitor<Void> visitor = new GoVisitor<>();
+        visitor.visit(sourceFileContext);
 
 
         // Output tokens recognized

@@ -22,7 +22,7 @@ public abstract class GoLexerBase extends Lexer {
         lastTokenType = token.getType();
     }
 
-    public int getLastTokenType() {
+    protected int getLastTokenType() {
         return lastTokenType;
     }
 }
