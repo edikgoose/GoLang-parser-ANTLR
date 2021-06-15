@@ -5,16 +5,18 @@ import org.antlr.v4.runtime.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.InputMismatchException;
 
 
 public class AppTest
 {
+
+    /* Testing lexer */
+
     @Test
+    @Ignore
     public void testLexer1() {
         String[] tokens = getTokensFromFile("src/test/resources/tests/go_src_1.go");
 
@@ -32,6 +34,7 @@ public class AppTest
     }
 
     @Test
+    @Ignore
     public void testLexer2() {
         String[] tokens = getTokensFromFile("src/test/resources/tests/go_src_2.go");
 
@@ -94,6 +97,7 @@ public class AppTest
     }
 
     @Test
+    @Ignore
     public void testLexer3() {
         String[] tokens = getTokensFromFile("src/test/resources/tests/go_src_3.go");
 
@@ -106,32 +110,73 @@ public class AppTest
     }
 
 
-    private String[] getTokensFromFile(String filePath) {
+
+    /* Testing parser */
+
+    @Test
+    @Ignore
+    public void testParser1() {
+        runParser("src/test/resources/tests/go_src_1.go");
+    }
+
+    @Test
+    @Ignore
+    public void testParser2() {
+        runParser("src/test/resources/tests/go_src_2.go");
+    }
+
+    @Test
+    @Ignore
+    public void testParser3() {
+        runParser("src/test/resources/tests/go_src_3.go");
+    }
+
+    @Test (expected = InputMismatchException.class)
+    @Ignore
+    public void testParser4() {
+        runParser("src/test/resources/tests/go_src_4.go");
+    }
+
+
+
+    /* Private functions */
+
+    private void runParser(String inputFilePath) throws InputMismatchException {
         try {
-            return getTokensFromInput(readFile(filePath)).toArray(String[]::new);
-        } catch (FileNotFoundException e) {
+            CharStream cs = CharStreams.fromFileName(inputFilePath);
+            GoLexer lexer = new GoLexer(cs);
+            CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+            GoParser parser = new GoParser(tokenStream);
+
+            parser.sourceFile();
+
+            if (parser.getNumberOfSyntaxErrors() > 1)
+                throw new InputMismatchException();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private String[] getTokensFromFile(String inputFilePath) {
+        try {
+            CharStream cs = CharStreams.fromFileName(inputFilePath);
+
+            GoLexer lexer = new GoLexer(cs);
+
+            var tokenList = lexer.getAllTokens();
+
+            ArrayList<String> tokens = new ArrayList<>(tokenList.size());
+
+            tokenList.forEach(e -> tokens.add(lexer.getVocabulary().getSymbolicName(e.getType())));
+            tokens.removeIf(e -> e.equals("WHITESPACE")); // remove whitespace-tokens from token
+
+            return tokens.toArray(String[]::new);
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private List<String> getTokensFromInput(String inputString) {
-        CharStream cs = CharStreams.fromString(inputString);
-        GoLexer lexer = new GoLexer(cs);
-
-        var tokenList = lexer.getAllTokens();
-
-        ArrayList<String> tokens = new ArrayList<>(tokenList.size());
-
-        tokenList.forEach(e -> tokens.add(lexer.getVocabulary().getSymbolicName(e.getType())));
-        tokens.add("END"); // add token "END" that recognizes EOF character since scanner cannot read EOF
-        tokens.removeIf(e -> e.equals("WHITESPACE")); // remove whitespace-tokens from token
-
-        return tokens;
-    }
-
-    private String readFile(String filePath) throws FileNotFoundException {
-        Scanner fileIn = new Scanner(new File(filePath));
-        return fileIn.useDelimiter("\\Z").next();
     }
 }

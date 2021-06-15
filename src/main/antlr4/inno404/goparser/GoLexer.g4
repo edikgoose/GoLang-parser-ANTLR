@@ -81,7 +81,6 @@ LINE_COMMENT                        :   '//' ~[\r\n]* -> channel(HIDDEN);
 
 /* End of statement */
 END                                 :   SEMI
-                                    |   EOF
                                     |   NEW_LINE
                                         {
                                             getLastTokenType() == IDENTIFIER    ||

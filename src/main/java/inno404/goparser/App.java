@@ -4,13 +4,16 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 
 
 public class App
 {
     private static class GoVisitor<T> extends GoParserBaseVisitor<T>{
+
         @Override
         public T visitSourceFile(GoParser.SourceFileContext ctx) {
             System.out.println("I started");
@@ -45,17 +48,11 @@ public class App
         }
     }
 
-    public static void main( String[] args ) {
-        // Input part
-        StringBuilder input = new StringBuilder();
-        Scanner scanner = new Scanner(System.in);
 
-        while (scanner.hasNextLine()) {
-            input.append(scanner.nextLine()).append(System.lineSeparator());
-        }
 
+    public static void main( String[] args ) throws IOException {
         // Init part
-        CharStream cs = CharStreams.fromString(input.toString());
+        CharStream cs = CharStreams.fromStream(System.in);
         GoLexer lexer = new GoLexer(cs);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         GoParser parser = new GoParser(stream);

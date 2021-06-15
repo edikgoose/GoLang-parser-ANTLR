@@ -8,8 +8,11 @@ options { tokenVocab=GoLexer; }
 '
 */
 
-
-sourceFile          :   packageClause END ( importDecl END )* ( topLevelDecl END )* EOF;
+/*
+sourceFile          :   packageClause END ( ((importDecl END)* (( topLevelDecl END )* | (topLevelDecl EOF)))
+                    | (importDecl EOF)) ;
+*/
+sourceFile          :   packageClause (END) ( importDecl (END | EOF) )* ( topLevelDecl (END | EOF))*;
 
 
 packageClause       :   PACKAGE packageName;
