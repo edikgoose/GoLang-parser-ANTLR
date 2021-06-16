@@ -70,7 +70,7 @@ public class App
         ArrayList<String> tokens = new ArrayList<>(tokenList.size());
 
         tokenList.forEach(e -> tokens.add(lexer.getVocabulary().getSymbolicName(e.getType())));
-        tokens.removeIf(e -> e.equals("WHITESPACE"));
+        tokens.removeIf(e -> e.equals("WHITESPACE")); // remove whitespace tokens
         System.out.println(tokens.size());
 
         System.out.println(tokens);

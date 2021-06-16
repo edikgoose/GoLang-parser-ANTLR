@@ -16,7 +16,6 @@ public class AppTest
     /* Testing lexer */
 
     @Test
-    @Ignore
     public void testLexer1() {
         String[] tokens = getTokensFromFile("src/test/resources/tests/go_src_1.go");
 
@@ -34,7 +33,6 @@ public class AppTest
     }
 
     @Test
-    @Ignore
     public void testLexer2() {
         String[] tokens = getTokensFromFile("src/test/resources/tests/go_src_2.go");
 
@@ -97,7 +95,6 @@ public class AppTest
     }
 
     @Test
-    @Ignore
     public void testLexer3() {
         String[] tokens = getTokensFromFile("src/test/resources/tests/go_src_3.go");
 
@@ -114,25 +111,21 @@ public class AppTest
     /* Testing parser */
 
     @Test
-    @Ignore
     public void testParser1() {
         runParser("src/test/resources/tests/go_src_1.go");
     }
 
     @Test
-    @Ignore
     public void testParser2() {
         runParser("src/test/resources/tests/go_src_2.go");
     }
 
     @Test
-    @Ignore
     public void testParser3() {
         runParser("src/test/resources/tests/go_src_3.go");
     }
 
     @Test (expected = InputMismatchException.class)
-    @Ignore
     public void testParser4() {
         runParser("src/test/resources/tests/go_src_4.go");
     }
@@ -150,7 +143,7 @@ public class AppTest
 
             parser.sourceFile();
 
-            if (parser.getNumberOfSyntaxErrors() > 1)
+            if (parser.getNumberOfSyntaxErrors() != 0)
                 throw new InputMismatchException();
 
         } catch (IOException e) {

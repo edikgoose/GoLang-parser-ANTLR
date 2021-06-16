@@ -8,11 +8,7 @@ options { tokenVocab=GoLexer; }
 '
 */
 
-/*
-sourceFile          :   packageClause END ( ((importDecl END)* (( topLevelDecl END )* | (topLevelDecl EOF)))
-                    | (importDecl EOF)) ;
-*/
-sourceFile          :   packageClause (END) ( importDecl (END | EOF) )* ( topLevelDecl (END | EOF))*;
+sourceFile          :   packageClause ( END ) ( importDecl ( END ) )* ( topLevelDecl ( END ) )* EOF;
 
 
 packageClause       :   PACKAGE packageName;
@@ -69,8 +65,8 @@ fieldDecl           :   (identifierList type | embeddedField) ( tag )?;
 embeddedField       :   ( '*' )? typeName;
 tag                 :   STRING_LIT;
 
-pointerType         : '*' baseType;
-baseType            : type;
+pointerType         :   '*' baseType;
+baseType            :   type;
 
 functionType        :   FUNC signature;
 signature           :   parameters ( result )?;
