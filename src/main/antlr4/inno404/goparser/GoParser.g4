@@ -16,7 +16,7 @@ sourceFile          :   packageClause ( END ) ( importDecl ( END ) )* ( topLevel
 packageClause       :   PACKAGE packageName;
 packageName         :   IDENTIFIER;
 
-importDecl          :   IMPORT ( importSpec | '(' ( importSpec END )* ')' );
+importDecl          :   IMPORT ( importSpec | '(' ( (importSpec END) (importSpec (END)?)? )* ')' );
 importSpec          :   ( '.' | packageName )? importPath;
 importPath          :   STRING_LIT;
 
@@ -35,17 +35,17 @@ methodDecl          :   FUNC receiver methodName signature ( functionBody )?;
 receiver            :   parameters;
 
 
-constDecl           :   CONST ( constSpec | '(' ( constSpec END )* ')' );
+constDecl           :   CONST ( constSpec | '(' ( (constSpec END) (constSpec (END)?)?  )* ')' );
 constSpec           :   identifierList ( ( type )? '=' expressionList )?;
 
 
-typeDecl            :   TYPE ( typeSpec | '(' ( typeSpec END )* ')' );
+typeDecl            :   TYPE ( typeSpec | '(' ( (typeSpec END) (typeSpec (END)?)?  )* ')' );
 typeSpec            :   aliasDecl | typeDef;
 aliasDecl           :   IDENTIFIER '=' type;
 typeDef             :   IDENTIFIER type;
 
 
-varDecl             :   VAR ( varSpec | '(' ( varSpec END )* ')' );
+varDecl             :   VAR ( varSpec | '(' ( (varSpec END) (varSpec (END)?)? )* ')' );
 varSpec             :   identifierList ( type ( '=' expressionList )? | '=' expressionList );
 
 
