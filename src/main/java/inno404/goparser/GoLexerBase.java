@@ -1,10 +1,6 @@
 package inno404.goparser;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.Lexer;
-
+import org.antlr.v4.runtime.*;
 
 
 public abstract class GoLexerBase extends Lexer {
@@ -17,12 +13,12 @@ public abstract class GoLexerBase extends Lexer {
 
     public GoLexerBase(CharStream input) {
         /*
-            Due to Antlr does not recognize rules with EOF token inside,
+            Since Antlr does not recognize rules with EOF token inside,
              we have to add line separator to the end of input CharStream
              in the constructor of the lexer
          */
         super(CharStreams.fromString(input.toString() + System.lineSeparator()));
-        lastTokenType = -1;
+        lastTokenType = -4;
     }
 
 

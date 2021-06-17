@@ -1,6 +1,8 @@
 parser grammar GoParser;
 
-options { tokenVocab=GoLexer; }
+options {
+    tokenVocab=GoLexer;
+ }
 
 /*
 'à'
@@ -142,7 +144,7 @@ functionLit         :   FUNC signature functionBody;
 
 
 block               :   '{' statementList '}';
-statementList       :   ( statement END )*;
+statementList       :   ( statement END )* (statement (END)?)?;
 
 
 statement           :   declaration | labeledStmt | simpleStmt

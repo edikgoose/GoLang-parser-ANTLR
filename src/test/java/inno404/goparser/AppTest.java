@@ -125,11 +125,46 @@ public class AppTest
         runParser("src/test/resources/tests/go_src_3.go");
     }
 
+    /**
+     * Error with word "Type" (incorrect: "hype")
+     */
     @Test (expected = InputMismatchException.class)
     public void testParser4() {
         runParser("src/test/resources/tests/go_src_4.go");
     }
 
+    @Test
+    public void testParser5(){ runParser("src/test/resources/tests/go_src_5.go");}
+
+    @Test
+    public void testParser6(){ runParser("src/test/resources/tests/go_src_6.go");}
+
+    /**
+     * Error with initialization in import block
+     */
+    @Test (expected = InputMismatchException.class)
+    public void testParser7(){ runParser("src/test/resources/tests/go_src_7.go");}
+
+    @Test
+    public void testParser8(){ runParser("src/test/resources/tests/go_src_8.go");}
+
+    @Test
+    public void testParser9(){ runParser("src/test/resources/tests/go_src_9.go");}
+
+    /**
+     * Error with excess right curly bracket
+     */
+    @Test (expected = InputMismatchException.class)
+    public void testParser10(){ runParser("src/test/resources/tests/go_src_10.go");}
+
+    @Test
+    public void testParser11(){ runParser("src/test/resources/tests/go_src_11.go");}
+
+    @Test
+    public void testParser12(){ runParser("src/test/resources/tests/go_src_12.go");}
+
+    @Test
+    public void testParser13(){ runParser("src/test/resources/tests/go_src_13.go");}
 
 
     /* Private functions */
