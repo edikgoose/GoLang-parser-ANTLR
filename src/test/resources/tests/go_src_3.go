@@ -1,5 +1,5 @@
 
-	package 			 main
+	package main
 
 /*/start of  code/*/func 	main() {
 

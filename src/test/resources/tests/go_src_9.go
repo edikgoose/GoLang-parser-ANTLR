@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
      "math/rand"
 	"sync"
@@ -12,6 +13,11 @@ import (
 )
 
 func main() {
+	const n = 500000000
+
+	const h = "foo" > "bar"    // h == true  (untyped boolean constant)
+
+	;
 
 	var state = make(map[int]int)
 
@@ -65,4 +71,5 @@ func main() {
 	fmt.Println( "state:",  state)
 	mutex.Unlock( )
 
+	return -1, errors.New("can't work with 42")
 }

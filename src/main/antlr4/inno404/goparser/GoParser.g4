@@ -16,7 +16,7 @@ sourceFile          :   packageClause ( END ) ( importDecl ( END ) )* ( topLevel
 packageClause       :   PACKAGE packageName;
 packageName         :   IDENTIFIER;
 
-importDecl          :   IMPORT ( importSpec | '(' ( (importSpec END) (importSpec (END)?)? )* ')' );
+importDecl          :   IMPORT ( importSpec | '(' ( importSpec END )* ( importSpec ( END )? )? ')' );
 importSpec          :   ( '.' | packageName )? importPath;
 importPath          :   STRING_LIT;
 
@@ -35,17 +35,17 @@ methodDecl          :   FUNC receiver methodName signature ( functionBody )?;
 receiver            :   parameters;
 
 
-constDecl           :   CONST ( constSpec | '(' ( (constSpec END) (constSpec (END)?)?  )* ')' );
+constDecl           :   CONST ( constSpec | '(' ( constSpec END )* ( constSpec ( END )? )? ')' );
 constSpec           :   identifierList ( ( type )? '=' expressionList )?;
 
 
-typeDecl            :   TYPE ( typeSpec | '(' ( (typeSpec END) (typeSpec (END)?)?  )* ')' );
+typeDecl            :   TYPE ( typeSpec | '(' ( ( typeSpec END ) )* ( typeSpec ( END )? )? ')' );
 typeSpec            :   aliasDecl | typeDef;
 aliasDecl           :   IDENTIFIER '=' type;
 typeDef             :   IDENTIFIER type;
 
 
-varDecl             :   VAR ( varSpec | '(' ( (varSpec END) (varSpec (END)?)? )* ')' );
+varDecl             :   VAR ( varSpec | '(' ( ( varSpec END ) )* ( varSpec ( END )? )? ')' );
 varSpec             :   identifierList ( type ( '=' expressionList )? | '=' expressionList );
 
 
@@ -54,7 +54,7 @@ varSpec             :   identifierList ( type ( '=' expressionList )? | '=' expr
 type                :   typeName | typeLit | '(' type ')';
 typeName            :   IDENTIFIER | qualifiedIdent;
 typeLit             :   arrayType | structType | pointerType | functionType |
-                    interfaceType | sliceType | mapType | channelType;
+                        interfaceType | sliceType | mapType | channelType;
 
 qualifiedIdent      :   packageName '.' IDENTIFIER;
 
@@ -62,7 +62,7 @@ arrayType           :   '[' arrayLength ']' elementType;
 arrayLength         :   expression;
 elementType         :   type;
 
-structType          :   STRUCT '{' ( fieldDecl END )* '}';
+structType          :   STRUCT '{' ( fieldDecl END )* ( fieldDecl ( END )? )? '}';
 fieldDecl           :   (identifierList type | embeddedField) ( tag )?;
 embeddedField       :   ( '*' )? typeName;
 tag                 :   STRING_LIT;
@@ -77,7 +77,7 @@ parameters          :   '(' ( parameterList ( ',' )? )? ')';
 parameterList       :   parameterDecl ( ',' parameterDecl )*;
 parameterDecl       :   ( identifierList )? ( '...' )? type;
 
-interfaceType       :   INTERFACE '{' ( ( methodSpec | interfaceTypeName ) END )* '}';
+interfaceType       :   INTERFACE '{' ( ( methodSpec | interfaceTypeName ) END )* ( ( methodSpec | interfaceTypeName ) ( END )? )? '}';
 methodSpec          :   methodName signature;
 methodName          :   IDENTIFIER;
 interfaceTypeName   :   typeName;
