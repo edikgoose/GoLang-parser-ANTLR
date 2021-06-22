@@ -12,7 +12,7 @@ These instructions will get you a copy of the project up and running on your loc
 ## How to use
 * Clone this repository to your machine
 * Write Go program into sample.go file
-* Build the project and execute .jar file
+* Build the project and execute ```GoParser.jar``` file in ```targe```
 
 
 ## Tests
