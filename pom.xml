@@ -4,7 +4,6 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-
   <groupId>inno404.goparser</groupId>
   <artifactId>GoLang-parser-ANTLR</artifactId>
   <version>1.0</version>
@@ -16,8 +15,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
   </properties>
-
-
 
   <dependencies>
     <dependency>
@@ -33,9 +30,7 @@
       <version>4.9.2</version>
       <scope>compile</scope>
     </dependency>    
-    
   </dependencies>
-
   <build>
             
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
@@ -85,10 +80,7 @@
       </plugins>
     </pluginManagement>
 
-
-
     <plugins>
-
       <!-- ANTLR -->
       <plugin>
         <groupId>org.antlr</groupId>
@@ -136,10 +128,6 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
-    
   </build>
-
-
 </project>

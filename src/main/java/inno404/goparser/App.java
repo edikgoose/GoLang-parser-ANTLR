@@ -6,11 +6,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.IOException;
 
-
-
 public class App {
 
-    public static void main( String[] args ) throws IOException {
+    public static void main(String[] args) throws IOException {
         // Init part
         CharStream cs = CharStreams.fromFileName("sample.go");
         GoLexer lexer = new GoLexer(cs);

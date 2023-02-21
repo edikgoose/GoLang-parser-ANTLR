@@ -4,20 +4,14 @@ options {
     tokenVocab=GoLexer;
  }
 
-/*
-'à'
-'
-'
-*/
-
 sourceFile          :   packageClause ( END ) ( importDecl ( END ) )* ( topLevelDecl ( END ) )* EOF;
 
 
 packageClause       :   PACKAGE packageName;
 packageName         :   IDENTIFIER;
 
-importDecl          :   IMPORT ( importSpec | '(' ( importSpec END )* ( importSpec ( END )? )? ')' );
-importSpec          :   ( '.' | packageName )? importPath;
+importDecl          :   IMPORT ( importSpec | L_PAREN ( importSpec END )* ( importSpec ( END )? )? R_PAREN );
+importSpec          :   ( DOT | packageName )? importPath;
 importPath          :   STRING_LIT;
 
 
@@ -35,63 +29,63 @@ methodDecl          :   FUNC receiver methodName signature ( functionBody )?;
 receiver            :   parameters;
 
 
-constDecl           :   CONST ( constSpec | '(' ( constSpec END )* ( constSpec ( END )? )? ')' );
-constSpec           :   identifierList ( ( type )? '=' expressionList )?;
+constDecl           :   CONST ( constSpec | L_PAREN ( constSpec END )* ( constSpec ( END )? )? R_PAREN );
+constSpec           :   identifierList ( ( type )? ASSIGN expressionList )?;
 
 
-typeDecl            :   TYPE ( typeSpec | '(' ( ( typeSpec END ) )* ( typeSpec ( END )? )? ')' );
+typeDecl            :   TYPE ( typeSpec | L_PAREN ( ( typeSpec END ) )* ( typeSpec ( END )? )? R_PAREN );
 typeSpec            :   aliasDecl | typeDef;
-aliasDecl           :   IDENTIFIER '=' type;
+aliasDecl           :   IDENTIFIER ASSIGN type;
 typeDef             :   IDENTIFIER type;
 
 
-varDecl             :   VAR ( varSpec | '(' ( ( varSpec END ) )* ( varSpec ( END )? )? ')' );
-varSpec             :   identifierList ( type ( '=' expressionList )? | '=' expressionList );
+varDecl             :   VAR ( varSpec | L_PAREN ( ( varSpec END ) )* ( varSpec ( END )? )? R_PAREN );
+varSpec             :   identifierList ( type ( ASSIGN expressionList )? | ASSIGN expressionList );
 
 
 
 
-type                :   typeName | typeLit | '(' type ')';
+type                :   typeName | typeLit | L_PAREN type R_PAREN;
 typeName            :   IDENTIFIER | qualifiedIdent;
 typeLit             :   arrayType | structType | pointerType | functionType |
                         interfaceType | sliceType | mapType | channelType;
 
-qualifiedIdent      :   packageName '.' IDENTIFIER;
+qualifiedIdent      :   packageName DOT IDENTIFIER;
 
-arrayType           :   '[' arrayLength ']' elementType;
+arrayType           :   L_BRACKET arrayLength R_BRACKET elementType;
 arrayLength         :   expression;
 elementType         :   type;
 
-structType          :   STRUCT '{' ( fieldDecl END )* ( fieldDecl ( END )? )? '}';
+structType          :   STRUCT L_CURLY ( fieldDecl END )* ( fieldDecl ( END )? )? R_CURLY;
 fieldDecl           :   (identifierList type | embeddedField) ( tag )?;
-embeddedField       :   ( '*' )? typeName;
+embeddedField       :   ( ASTERISK )? typeName;
 tag                 :   STRING_LIT;
 
-pointerType         :   '*' baseType;
+pointerType         :   ASTERISK baseType;
 baseType            :   type;
 
 functionType        :   FUNC signature;
 signature           :   parameters ( result )?;
 result              :   parameters | type;
-parameters          :   '(' ( parameterList ( ',' )? )? ')';
-parameterList       :   parameterDecl ( ',' parameterDecl )*;
-parameterDecl       :   ( identifierList )? ( '...' )? type;
+parameters          :   L_PAREN ( parameterList ( COMMA )? )? R_PAREN;
+parameterList       :   parameterDecl ( COMMA parameterDecl )*;
+parameterDecl       :   ( identifierList )? ( ELLIPSIS )? type;
 
-interfaceType       :   INTERFACE '{' ( ( methodSpec | interfaceTypeName ) END )* ( ( methodSpec | interfaceTypeName ) ( END )? )? '}';
+interfaceType       :   INTERFACE L_CURLY ( ( methodSpec | interfaceTypeName ) END )* ( ( methodSpec | interfaceTypeName ) ( END )? )? R_CURLY;
 methodSpec          :   methodName signature;
 methodName          :   IDENTIFIER;
 interfaceTypeName   :   typeName;
 
-sliceType           :   '[' ']' elementType;
-mapType             :   MAP '[' keyType ']' elementType;
+sliceType           :   L_BRACKET R_BRACKET elementType;
+mapType             :   MAP L_BRACKET keyType R_BRACKET elementType;
 keyType             :   type;
-channelType         :   ( CHAN | CHAN '<-' | '<-' CHAN ) elementType;
+channelType         :   ( CHAN | CHAN RECEIVE | RECEIVE CHAN ) elementType;
 
 
 
 
-identifierList      :   IDENTIFIER ( ',' IDENTIFIER )* ;
-expressionList      :   expression ( ',' expression )* ;
+identifierList      :   IDENTIFIER ( COMMA IDENTIFIER )* ;
+expressionList      :   expression ( COMMA expression )* ;
 
 
 expression          :   unaryExpr | expression binary_op expression;
@@ -99,41 +93,41 @@ expression          :   unaryExpr | expression binary_op expression;
 
 unaryExpr           :   primaryExpr | unary_op unaryExpr;
 
-binary_op           :   '||' | '&&' | rel_op | add_op | mul_op;
-rel_op              :   '==' | '!=' | '<' | '<=' | '>' | '>=';
-add_op              :   '+' | '-' | '|' | '^';
-mul_op              :   '*' | '/' | '%' | '<<' | '>>' | '&' | '&^';
+binary_op           :   LOGICAL_OR | LOGICAL_AND | rel_op | add_op | mul_op;
+rel_op              :   EQUALS | NOT_EQUALS | LESS | LESS_OR_EQUALS | GREATER | GREATER_OR_EQUALS;
+add_op              :   PLUS | MINUS | OR | CARET;
+mul_op              :   ASTERISK | DIV | MOD | LSHIFT | RSHIFT | AMPERSAND | BIT_CLEAR;
 
-unary_op            :   '+' | '-' | '!' | '^' | '*' | '&' | '<-';
+unary_op            :   PLUS | MINUS | EXCLAMATION | CARET | ASTERISK | AMPERSAND | RECEIVE;
 
 
 primaryExpr         :   operand | conversion | methodExpr | primaryExpr selector
                     |   primaryExpr index | primaryExpr slice | primaryExpr typeAssertion
 	                |   primaryExpr arguments;
 
-conversion          :   type '(' expression ( ',' )? ')';
+conversion          :   type L_PAREN expression ( COMMA )? R_PAREN;
 
-methodExpr          :   receiverType '.' methodName;
+methodExpr          :   receiverType DOT methodName;
 receiverType        :   type;
 
-selector            :   '.' IDENTIFIER;
-index               :   '[' expression ']';
-slice               :   '[' ( expression )? ':' ( expression ?) ']' |
-                        '[' ( expression )? ':' expression ':' expression ']';
-typeAssertion       :   '.' '(' type ')';
-arguments           :   '(' ( ( expressionList | type ( ',' expressionList )? ) ( '...' )? ( ',' )? )? ')';
+selector            :   DOT IDENTIFIER;
+index               :   L_BRACKET expression R_BRACKET;
+slice               :   L_BRACKET ( expression )? COLON ( expression ?) R_BRACKET |
+                        L_BRACKET ( expression )? COLON expression COLON expression R_BRACKET;
+typeAssertion       :   DOT L_PAREN type R_PAREN;
+arguments           :   L_PAREN ( ( expressionList | type ( COMMA expressionList )? ) ( ELLIPSIS )? ( COMMA )? )? R_PAREN;
 
-operand             :   literal | operandName | '(' expression ')';
+operand             :   literal | operandName | L_PAREN expression R_PAREN;
 literal             :   basicLit | compositeLit | functionLit;
 basicLit            :   INT_LIT | FLOAT_LIT | IMAGINARY_LIT | RUNE_LIT | STRING_LIT;
 operandName         :   IDENTIFIER | qualifiedIdent;
 
 compositeLit        :   literalType literalValue;
-literalType         :   structType | arrayType | '[' '...' ']' elementType
+literalType         :   structType | arrayType | L_BRACKET ELLIPSIS R_BRACKET elementType
                     |   sliceType | mapType | typeName;
-literalValue        :   '{' ( elementList ( ',' )? )? '}';
-elementList         :   keyedElement ( ',' keyedElement )*;
-keyedElement        :   ( key ':' )? element;
+literalValue        :   L_CURLY ( elementList ( COMMA )? )? R_CURLY;
+elementList         :   keyedElement ( COMMA keyedElement )*;
+keyedElement        :   ( key COLON )? element;
 key                 :   fieldName | expression | literalValue;
 fieldName           :   IDENTIFIER;
 element             :   expression | literalValue;
@@ -143,7 +137,7 @@ functionLit         :   FUNC signature functionBody;
 
 
 
-block               :   '{' statementList '}';
+block               :   L_CURLY statementList R_CURLY;
 statementList       :   ( statement END )* (statement (END)?)?;
 
 
@@ -156,7 +150,7 @@ simpleStmt          :   emptyStmt | expressionStmt | sendStmt
                     |   incDecStmt | assignment | shortVarDecl;
 
 
-labeledStmt         :   label ':' statement;
+labeledStmt         :   label COLON statement;
 label               :   IDENTIFIER;
 
 
@@ -182,21 +176,21 @@ ifStmt              :   IF ( simpleStmt END )? expression block ( ELSE ( ifStmt 
 
 switchStmt          :   exprSwitchStmt | typeSwitchStmt;
 
-exprSwitchStmt      :   SWITCH ( simpleStmt END )? ( expression )? '{' ( exprCaseClause )* '}';
-exprCaseClause      :   exprSwitchCase ':' statementList;
+exprSwitchStmt      :   SWITCH ( simpleStmt END )? ( expression )? L_CURLY ( exprCaseClause )* R_CURLY;
+exprCaseClause      :   exprSwitchCase COLON statementList;
 exprSwitchCase      :   CASE expressionList | DEFAULT;
 
-typeSwitchStmt      :   SWITCH ( simpleStmt END )? typeSwitchGuard '{' ( typeCaseClause )* '}';
-typeSwitchGuard     :   ( IDENTIFIER ':=' )? primaryExpr '.' '(' TYPE ')';
-typeCaseClause      :   typeSwitchCase ':' statementList;
+typeSwitchStmt      :   SWITCH ( simpleStmt END )? typeSwitchGuard L_CURLY ( typeCaseClause )* R_CURLY;
+typeSwitchGuard     :   ( IDENTIFIER DECLARE_ASSIGN )? primaryExpr DOT L_PAREN TYPE R_PAREN;
+typeCaseClause      :   typeSwitchCase COLON statementList;
 typeSwitchCase      :   CASE typeList | DEFAULT;
-typeList            :   type ( ',' type )*;
+typeList            :   type ( COMMA type )*;
 
 
-selectStmt          :   SELECT '{' ( commClause )* '}';
-commClause          :   commCase ':' statementList;
+selectStmt          :   SELECT L_CURLY ( commClause )* R_CURLY;
+commClause          :   commCase COLON statementList;
 commCase            :   CASE ( sendStmt | recvStmt ) | DEFAULT;
-recvStmt            :   ( expressionList '=' | identifierList ':=' )? recvExpr;
+recvStmt            :   ( expressionList ASSIGN | identifierList DECLARE_ASSIGN )? recvExpr;
 recvExpr            :   expression;
 
 
@@ -207,7 +201,7 @@ forClause           :   ( initStmt )? END ( condition )? END ( postStmt )?;
 initStmt            :   simpleStmt;
 postStmt            :   simpleStmt;
 
-rangeClause         :   ( expressionList '=' | identifierList ':=' )? RANGE expression;
+rangeClause         :   ( expressionList ASSIGN | identifierList DECLARE_ASSIGN )? RANGE expression;
 
 
 deferStmt           :   DEFER expression;
@@ -227,7 +221,7 @@ incDecStmt          :   expression ( PLUS_PLUS | MINUS_MINUS );
 
 
 assignment          :   expressionList assign_op expressionList;
-assign_op           :   ( add_op | mul_op )? '=';
+assign_op           :   ( add_op | mul_op )? ASSIGN;
 
 
-shortVarDecl        :   identifierList ':=' expressionList;
+shortVarDecl        :   identifierList DECLARE_ASSIGN expressionList;
